@@ -1,0 +1,129 @@
+// ignore_for_file: camel_case_types, library_private_types_in_public_api
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'sponsor_setting.dart';
+
+import '../Citizen/change_pass.dart';
+import '../controllers/auth_controller.dart';
+
+class S_HamBurger extends StatefulWidget {
+  const S_HamBurger({super.key});
+
+  @override
+  _S_HamBurgerState createState() => _S_HamBurgerState();
+}
+
+class _S_HamBurgerState extends State<S_HamBurger> {
+  String fname = "a";
+  String lname = "a";
+  String email = "a";
+  String imageUrl = '';
+
+  void getData() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    var vari = await FirebaseFirestore.instance
+        .collection("users")
+        .doc(user?.uid)
+        .get();
+    setState(() {
+      fname = vari.data()!['headName'];
+      email = vari.data()!['email'];
+    });
+  }
+
+  @override
+  void initState() {
+    getData();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+        backgroundColor: Colors.green[200],
+        child: Column(
+          children: <Widget>[
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              color: Colors.green,
+              child: Center(
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      width: 100,
+                      height: 100,
+                      margin: const EdgeInsets.only(
+                        top: 30,
+                      ),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                            image: NetworkImage(imageUrl), fit: BoxFit.cover),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Text(
+                      '$fname $lname',
+                      style: const TextStyle(fontSize: 20, color: Colors.white),
+                    ),
+                    Text(
+                      email,
+                      style: const TextStyle(fontSize: 17, color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.edit),
+              title: const Text(
+                'Edit Profile',
+                style: TextStyle(
+                  fontSize: 18,
+                ),
+              ),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const Sponsor_Settings(),
+                    ));
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.password),
+              title: const Text(
+                'Change Password',
+                style: TextStyle(
+                  fontSize: 18,
+                ),
+              ),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ChangePass(),
+                    ));
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text(
+                'Logout',
+                style: TextStyle(
+                  fontSize: 18,
+                ),
+              ),
+              onTap: () {
+                AuthController.instance.logout();
+              },
+            ),
+          ],
+        ));
+  }
+}
